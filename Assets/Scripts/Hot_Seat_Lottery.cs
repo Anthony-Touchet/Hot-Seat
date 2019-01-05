@@ -7,6 +7,14 @@ using UnityEngine.UI;
 public class Hot_Seat_Lottery : MonoBehaviour
 {
     public List<GameObject> buttons;
+    public Winner_Selection_Animation wsa;
+    public GameObject LottoStartButton;
+
+    public string Winner
+    {
+        get { return winner; }
+    }
+        
     private string winner;
     private List<string> participants = new List<string>();
 
@@ -21,6 +29,8 @@ public class Hot_Seat_Lottery : MonoBehaviour
         }
 
         winner = finalists[r.Next(0, finalists.Count)];
+
+        wsa.enabled = true;
     }
 
     public void TogglePress(GameObject go)
@@ -50,6 +60,12 @@ public class Hot_Seat_Lottery : MonoBehaviour
                 newColor.normalColor = new Color(0, 1, 1);
             }
             toggle.colors = newColor;
+
+            if(participants.Count < 10)
+            {
+                LottoStartButton.SetActive(false);
+            }
+
             return;
         }
 
@@ -58,6 +74,12 @@ public class Hot_Seat_Lottery : MonoBehaviour
         newColor.highlightedColor = Color.yellow;
         newColor.normalColor = Color.yellow;
         toggle.colors = newColor;
+
+        if (participants.Count >= 10)
+        {
+            LottoStartButton.SetActive(true);
+        }
+
         return;
     }
 }
