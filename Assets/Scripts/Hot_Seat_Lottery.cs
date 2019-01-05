@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,12 +7,20 @@ using UnityEngine.UI;
 public class Hot_Seat_Lottery : MonoBehaviour
 {
     public List<GameObject> buttons;
-    public List<string> participants = new List<string>();
+    private string winner;
+    private List<string> participants = new List<string>();
 
-    // Start is called before the first frame update
     public void StartLottery()
     {
-        
+        System.Random r = new System.Random();
+        List<string> finalists = new List<string>();
+        int finalistCount = participants.Count / 4;
+        for(int i =0; i < finalistCount; i++)
+        {
+            finalists.Add(participants[r.Next(0, participants.Count)]);
+        }
+
+        winner = finalists[r.Next(0, finalists.Count)];
     }
 
     public void TogglePress(GameObject go)
@@ -52,3 +61,4 @@ public class Hot_Seat_Lottery : MonoBehaviour
         return;
     }
 }
+
