@@ -82,5 +82,10 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
         return;
     }
+
+    public void QuitProgram()
+    {
+        Application.Quit();
+    }
 }
 

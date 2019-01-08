@@ -10,6 +10,10 @@ public class Winner_Selection_Animation : MonoBehaviour
     public float animationOffset;
     public float verticalForce;
     public float spinForce;
+    public float waitFor;
+    public GameObject selectionScreen;
+    public GameObject winnerScreen;
+    public Text winnerDisplayText;
 
     private string winner;
     private GameObject winnerButton;
@@ -36,10 +40,16 @@ public class Winner_Selection_Animation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (buttons.Count == 0)
+        if (buttons.Count == 0 && Time.time >= (nextAnimationTime + waitFor))
+        {
+            selectionScreen.SetActive(false);
+            winnerScreen.SetActive(true);
+            winnerDisplayText.text = winner;
             this.enabled = false;
+        }
+            
 
-        if(Time.time >= nextAnimationTime)
+        if(Time.time >= nextAnimationTime && buttons.Count > 0)
         {
             nextAnimationTime = Time.time + animationOffset;
             var go = buttons[random.Next(0, buttons.Count)];
