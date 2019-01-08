@@ -14,6 +14,10 @@ public class Hot_Seat_Lottery : MonoBehaviour
     {
         get { return winner; }
     }
+    public List<string> Participants
+    {
+        get { return participants; }
+    }
         
     private string winner;
     private List<string> participants = new List<string>();
@@ -44,20 +48,20 @@ public class Hot_Seat_Lottery : MonoBehaviour
         {
             participants.Remove(lottoNum);
 
-            if (lottoNum.Contains("r"))
+            if (lottoNum.Contains("B") || lottoNum.Contains("G"))
             {               
-                newColor.highlightedColor = new Color(1, .2f, .2f);
-                newColor.normalColor = new Color(1, .2f, .2f);
+                newColor.highlightedColor = new Color(.5f, 0, 0);
+                newColor.normalColor = new Color(.5f, 0, 0);
             }
-            else if (lottoNum.Contains("g"))
+            else if (lottoNum.Contains("I") || lottoNum.Contains("O"))
             {
-                newColor.highlightedColor = new Color(0, 1, 0);
-                newColor.normalColor = new Color(0, 1, 0);
+                newColor.highlightedColor = new Color(0, .5f, 0);
+                newColor.normalColor = new Color(0, .5f, 0);
             }
-            else if (lottoNum.Contains("b"))
+            else if (lottoNum.Contains("N"))
             {
-                newColor.highlightedColor = new Color(0,1,1);
-                newColor.normalColor = new Color(0, 1, 1);
+                newColor.highlightedColor = new Color(0,0,.5f);
+                newColor.normalColor = new Color(0, 0, .5f);
             }
             toggle.colors = newColor;
 
@@ -71,8 +75,8 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
         participants.Add(lottoNum);
 
-        newColor.highlightedColor = Color.yellow;
-        newColor.normalColor = Color.yellow;
+        newColor.highlightedColor = new Color(.5f, .5f, 0);
+        newColor.normalColor = new Color(.5f, .5f, 0);
         toggle.colors = newColor;
 
         if (participants.Count >= 10)

@@ -10,7 +10,8 @@ public class Winner_Selection_Animation : MonoBehaviour
     public float animationOffset;
     public float verticalForce;
     public float spinForce;
-    public float waitFor;
+    public float startDelay;
+    public float endDelay;
     public GameObject selectionScreen;
     public GameObject winnerScreen;
     public Text winnerDisplayText;
@@ -25,22 +26,54 @@ public class Winner_Selection_Animation : MonoBehaviour
     {
         winner = hot_Seat_Lottery.Winner;
         buttons = hot_Seat_Lottery.buttons;
+        List<GameObject> tempList = new List<GameObject>();
 
         foreach(GameObject go in hot_Seat_Lottery.buttons)
-        {
-            if(go.GetComponentInChildren<Text>().text == winner)
+        {  
+            //Find winner
+            if (go.GetComponentInChildren<Text>().text == winner)
             {
-                winnerButton = go;
+                tempList.Add(go);
+                continue;
+            }
+
+            // Get Non participants
+            if (!hot_Seat_Lottery.Participants.Contains(go.GetComponentInChildren<Text>().text))
+            {
+                var gray = ColorBlock.defaultColorBlock;
+                gray.highlightedColor = Color.gray;
+                gray.normalColor = Color.gray;
+
+                go.GetComponent<Toggle>().colors = gray;
+
+                tempList.Add(go);
+
+                Rigidbody2D rb = go.AddComponent<Rigidbody2D>();
+                rb.mass = 10000f;
+
+                rb.velocity = (transform.up * verticalForce);
+
+                var rotate = go.AddComponent<Rotate>();
+                rotate.rotationSpeed = spinForce;
+                var dd = go.AddComponent<Destroy_Delay>();
+                dd.timeAlive = 10f;
             }
         }
+        
+        foreach (GameObject go in tempList)
+        {
+            if (buttons.Contains(go))
+                buttons.Remove(go);
+        }
 
-        buttons.Remove(winnerButton);
+        nextAnimationTime = Time.time + startDelay;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (buttons.Count == 0 && Time.time >= (nextAnimationTime + waitFor))
+
+        if (buttons.Count == 0 && Time.time >= (nextAnimationTime + endDelay))
         {
             selectionScreen.SetActive(false);
             winnerScreen.SetActive(true);
