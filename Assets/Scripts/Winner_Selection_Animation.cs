@@ -29,7 +29,8 @@ public class Winner_Selection_Animation : MonoBehaviour
         List<GameObject> tempList = new List<GameObject>();
 
         foreach(GameObject go in hot_Seat_Lottery.buttons)
-        {  
+        {
+            
             //Find winner
             if (go.GetComponentInChildren<Text>().text == winner)
             {
@@ -40,10 +41,11 @@ public class Winner_Selection_Animation : MonoBehaviour
             // Get Non participants
             if (!hot_Seat_Lottery.Participants.Contains(go.GetComponentInChildren<Text>().text))
             {
+                go.GetComponent<Toggle>().enabled = false;
                 var gray = ColorBlock.defaultColorBlock;
                 gray.highlightedColor = Color.gray;
                 gray.normalColor = Color.gray;
-
+ 
                 go.GetComponent<Toggle>().colors = gray;
 
                 tempList.Add(go);

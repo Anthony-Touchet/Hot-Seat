@@ -23,7 +23,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         
     private string winner;
     private List<string> participants = new List<string>();
-    private string lottoHistoryFileName;
+    private string lottoHistoryFileName = "/Winner Log.txt";
     private string winningsSelectionFileName;
 
     public void StartLottery()
@@ -31,9 +31,9 @@ public class Hot_Seat_Lottery : MonoBehaviour
         // See if file Exists
         FileStream saveStream;
 
-        saveStream = (File.Exists(Application.persistentDataPath + "/Winner Log.txt")) ?
-            File.Open(Application.persistentDataPath + "/Winner Log.txt", FileMode.Open) :
-            File.Create(Application.persistentDataPath + "/Winner Log.txt");
+        saveStream = (File.Exists(Application.persistentDataPath + lottoHistoryFileName)) ?
+            File.Open(Application.persistentDataPath + lottoHistoryFileName, FileMode.Open) :
+            File.Create(Application.persistentDataPath + lottoHistoryFileName);
         
         StreamReader streamReader = new StreamReader(saveStream);
         var oldData = streamReader.ReadToEnd();
@@ -67,8 +67,8 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
             foreach (string s in parsedString)
             {
-                if (s.Contains("B") || s.Contains("I") || s.Contains("N") || s.Contains("G") ||
-                    s.Contains("O"))
+                if (s.Contains("B-") || s.Contains("I-") || s.Contains("N-") || s.Contains("G-") ||
+                    s.Contains("O-"))
                     tempList.Add(s);
             }
                 
@@ -79,11 +79,10 @@ public class Hot_Seat_Lottery : MonoBehaviour
             }
                 
         }
-        streamReader.Close();
 
         saveStream.Position = 0;
         StreamWriter streamWriter = new StreamWriter(saveStream);
-        string newData = winner + " " + DateTime.Now + " ";
+        string newData = winner + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
         streamWriter.WriteLine(newData);
         streamWriter.Write(oldData);
 
