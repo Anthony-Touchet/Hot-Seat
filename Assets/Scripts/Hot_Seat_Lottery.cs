@@ -22,6 +22,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
     }
         
     private string winner;
+    private string winnerPayout = "";
     private List<string> participants = new List<string>();
     private string lottoHistoryFileName = "/Winner Log.txt";
     private string winningsSelectionFileName;
@@ -44,6 +45,8 @@ public class Hot_Seat_Lottery : MonoBehaviour
         List<string> finalists = new List<string>();
         int finalistCount = participants.Count / 4;
         bool lookinfForWinner = true;
+
+        bool canChangePool = false;
 
         //Look for winner
         while (lookinfForWinner)
@@ -80,9 +83,60 @@ public class Hot_Seat_Lottery : MonoBehaviour
                 
         }
 
+        // Get a winnerPayout
+        int ticket = r.Next(0, 100);
+        if(ticket <= 21)
+        {
+            winnerPayout = "$20";
+        }
+        else if (ticket >= 22 && ticket <= 41)
+        {
+            winnerPayout = "$30";
+        }
+
+        else if (ticket >= 42 && ticket <= 56)
+        {
+            winnerPayout = "$35";
+        }
+
+        else if (ticket >= 57 && ticket <= 70)
+        {
+            winnerPayout = "$40";
+        }
+
+        else if (ticket >= 71 && ticket <= 77)
+        {
+            winnerPayout = "$50";
+        }
+
+        else if (ticket >= 78 && ticket <= 84)
+        {
+            winnerPayout = "$60";
+        }
+
+        else if (ticket >= 85 && ticket <= 90)
+        {
+            winnerPayout = "$80";
+        }
+
+        else if (ticket >= 91 && ticket <= 94)
+        {
+            winnerPayout = "$100";
+        }
+
+        else if (ticket >= 95 && ticket <= 98)
+        {
+            winnerPayout = "$30";
+        }
+
+        else if (ticket > 98 )
+        {
+            winnerPayout = "$200";
+        }
+
         saveStream.Position = 0;
         StreamWriter streamWriter = new StreamWriter(saveStream);
-        string newData = winner + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
+        string newData = winner + " " + winnerPayout + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
         streamWriter.WriteLine(newData);
         streamWriter.Write(oldData);
 
