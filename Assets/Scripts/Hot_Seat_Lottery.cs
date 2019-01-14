@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Hot_Seat_Lottery : MonoBehaviour
 {
+    public string path;
+
     public List<GameObject> buttons;
+    public List<GameObject> rewardToggles;
+    public InputField passwordInput;
+
     public Winner_Selection_Animation wsa;
     public GameObject LottoStartButton;
     public int selectionWait;
@@ -16,6 +22,12 @@ public class Hot_Seat_Lottery : MonoBehaviour
     {
         get { return winner; }
     }
+
+    public string PayOut
+    {
+        get { return winnerPayout; }
+    }
+
     public List<string> Participants
     {
         get { return participants; }
@@ -23,30 +35,33 @@ public class Hot_Seat_Lottery : MonoBehaviour
         
     private string winner;
     private string winnerPayout = "";
+
     private List<string> participants = new List<string>();
+    public List<int> possibleRewards = new List<int>();
+
     private string lottoHistoryFileName = "/Winner Log.txt";
-    private string winningsSelectionFileName;
+    private string rewardLogFileName = "/Reward Table.txt";
 
     public void StartLottery()
     {
-        // See if file Exists
-        FileStream saveStream;
+        path = Application.persistentDataPath;
+        // See if files Exists
+        FileStream logStream;
 
-        saveStream = (File.Exists(Application.persistentDataPath + lottoHistoryFileName)) ?
+        logStream = (File.Exists(Application.persistentDataPath + lottoHistoryFileName)) ?
             File.Open(Application.persistentDataPath + lottoHistoryFileName, FileMode.Open) :
             File.Create(Application.persistentDataPath + lottoHistoryFileName);
-        
-        StreamReader streamReader = new StreamReader(saveStream);
+
+        // Get the old data(log)
+        StreamReader streamReader = new StreamReader(logStream);
         var oldData = streamReader.ReadToEnd();
-        saveStream.Position = 0;
+        logStream.Position = 0;
         streamReader.DiscardBufferedData();
 
         System.Random r = new System.Random();
         List<string> finalists = new List<string>();
         int finalistCount = participants.Count / 4;
         bool lookinfForWinner = true;
-
-        bool canChangePool = false;
 
         //Look for winner
         while (lookinfForWinner)
@@ -84,64 +99,78 @@ public class Hot_Seat_Lottery : MonoBehaviour
         }
 
         // Get a winnerPayout
-        int ticket = r.Next(0, 100);
-        if(ticket <= 21)
+        bool lookingForPayout = true;
+        while (lookingForPayout)
         {
-            winnerPayout = "$20";
-        }
-        else if (ticket >= 22 && ticket <= 41)
-        {
-            winnerPayout = "$30";
+            int ticket = r.Next(0, 100);
+            if (ticket <= 21 && possibleRewards.Contains(20))
+            {
+                winnerPayout = "$20";
+                lookingForPayout = false;
+            }
+            else if (ticket >= 22 && ticket <= 41 && possibleRewards.Contains(30))
+            {
+                winnerPayout = "$30";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 42 && ticket <= 56 && possibleRewards.Contains(35))
+            {
+                winnerPayout = "$35";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 57 && ticket <= 70 && possibleRewards.Contains(40))
+            {
+                winnerPayout = "$40";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 71 && ticket <= 77 && possibleRewards.Contains(50))
+            {
+                winnerPayout = "$50";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 78 && ticket <= 84 && possibleRewards.Contains(60))
+            {
+                winnerPayout = "$60";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 85 && ticket <= 90 && possibleRewards.Contains(80))
+            {
+                winnerPayout = "$80";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 91 && ticket <= 94 && possibleRewards.Contains(100))
+            {
+                winnerPayout = "$100";
+                lookingForPayout = false;
+            }
+
+            else if (ticket >= 95 && ticket <= 98 && possibleRewards.Contains(150))
+            {
+                winnerPayout = "$150";
+                lookingForPayout = false;
+            }
+
+            else if (ticket > 98 && possibleRewards.Contains(200))
+            {
+                winnerPayout = "$200";
+                lookingForPayout = false;
+            }
         }
 
-        else if (ticket >= 42 && ticket <= 56)
-        {
-            winnerPayout = "$35";
-        }
-
-        else if (ticket >= 57 && ticket <= 70)
-        {
-            winnerPayout = "$40";
-        }
-
-        else if (ticket >= 71 && ticket <= 77)
-        {
-            winnerPayout = "$50";
-        }
-
-        else if (ticket >= 78 && ticket <= 84)
-        {
-            winnerPayout = "$60";
-        }
-
-        else if (ticket >= 85 && ticket <= 90)
-        {
-            winnerPayout = "$80";
-        }
-
-        else if (ticket >= 91 && ticket <= 94)
-        {
-            winnerPayout = "$100";
-        }
-
-        else if (ticket >= 95 && ticket <= 98)
-        {
-            winnerPayout = "$30";
-        }
-
-        else if (ticket > 98 )
-        {
-            winnerPayout = "$200";
-        }
-
-        saveStream.Position = 0;
-        StreamWriter streamWriter = new StreamWriter(saveStream);
+        logStream.Position = 0;
+        StreamWriter streamWriter = new StreamWriter(logStream);
         string newData = winner + " " + winnerPayout + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
         streamWriter.WriteLine(newData);
         streamWriter.Write(oldData);
 
         streamWriter.Close();
-        saveStream.Close();
+        logStream.Close();
 
         wsa.enabled = true;
     }
@@ -199,6 +228,145 @@ public class Hot_Seat_Lottery : MonoBehaviour
     public void QuitProgram()
     {
         Application.Quit();
+    }
+
+    public void LoadRewards()
+    {
+        FileStream rewardStream;
+
+        rewardStream = (File.Exists(Application.persistentDataPath + rewardLogFileName)) ?
+            File.Open(Application.persistentDataPath + rewardLogFileName, FileMode.Open) :
+            File.Create(Application.persistentDataPath + rewardLogFileName);
+
+        StreamReader streamReader = new StreamReader(rewardStream);
+        var data = streamReader.ReadToEnd();
+
+        // If the data doesn't exisit
+        if(data == "")
+        {
+            foreach (GameObject go in rewardToggles)
+            {
+                string reward = go.GetComponentInChildren<Text>().text;
+                reward = reward.Remove(0, 1);
+                int numReward;
+                Int32.TryParse(reward, out numReward);
+                possibleRewards.Add(numReward);
+            }
+            rewardStream.Close();
+            return;
+        }
+
+        // Else Decode Data
+        List<int> result = new List<int>();
+        List<string> temp = new List<string>();
+
+        var parsedData = data.Split('!');
+        foreach (string s in parsedData)
+            temp.Add(s);
+        foreach (string s in temp)
+        {
+            int o = 0;
+            string number = "";
+            var parsedString = s.Split(' ');
+            foreach (string ss in parsedString)
+            {
+                Int32.TryParse(ss, out o);
+                number += (char)(o / 87);
+            }
+
+            int num = 0;
+            Int32.TryParse(number, out num);
+            result.Add(num);
+        }
+        result.Remove(result.Last());
+        rewardStream.Close();
+
+        possibleRewards = result;
+    }
+
+    public void WriteRewards()
+    {
+        // Encoding Sequence
+        string result = "";
+        foreach (int i in possibleRewards)
+        {
+            string temp = i.ToString();
+            foreach (char c in temp)
+            {
+                result += (int)c * 87;
+                result += " ";
+            }
+            result += '!';
+        }
+
+        FileStream rewardStream;
+
+        rewardStream = (File.Exists(Application.persistentDataPath + rewardLogFileName)) ?
+            File.Open(Application.persistentDataPath + rewardLogFileName, FileMode.Open) :
+            File.Create(Application.persistentDataPath + rewardLogFileName);
+
+        StreamWriter streamWriter = new StreamWriter(rewardStream);
+        streamWriter.Write(result);
+        streamWriter.Close();
+    }
+
+    public void CheckPassword()
+    {
+       if(passwordInput.text == "iloveyou143")
+        {
+            foreach(GameObject go in rewardToggles)
+            {
+                go.SetActive(true);
+            }
+            ColorBlock newColor = ColorBlock.defaultColorBlock;
+            newColor.normalColor = Color.green;
+            newColor.highlightedColor = Color.green;
+
+            passwordInput.colors = newColor;
+
+            foreach(GameObject go in rewardToggles)
+            {
+                var toggle = go.GetComponent<Toggle>();
+                string rewardString = go.GetComponentInChildren<Text>().text.Remove(0, 1);
+                int rewardInt;
+                Int32.TryParse(rewardString, out rewardInt);
+
+                toggle.isOn = (possibleRewards.Contains(rewardInt)) ? true : false;
+            }
+
+        }
+
+        else
+        {
+            ColorBlock newColor = ColorBlock.defaultColorBlock;
+            newColor.normalColor = Color.red;
+            newColor.highlightedColor = Color.red;
+
+            passwordInput.colors = newColor;
+        }
+    }
+
+    public void ResetColorBlock()
+    {
+        ColorBlock newColor = ColorBlock.defaultColorBlock;
+        passwordInput.colors = newColor;
+    }
+
+    public void OnRewardToggle(GameObject go)
+    {
+        bool toggle = go.GetComponent<Toggle>().isOn;
+        int reward = 0;
+        Int32.TryParse(go.GetComponentInChildren<Text>().text.Remove(0, 1), out reward);
+
+        if (toggle == true && !possibleRewards.Contains(reward))
+        {
+            possibleRewards.Add(reward);
+        }
+
+        else if (toggle == false && possibleRewards.Contains(reward))
+        {
+            possibleRewards.Remove(reward);
+        }
     }
 }
 

@@ -15,8 +15,8 @@ public class Winner_Selection_Animation : MonoBehaviour
     public GameObject selectionScreen;
     public GameObject winnerScreen;
     public Text winnerDisplayText;
+    public Text rewardDisplayText;
 
-    private string winner;
     private GameObject winnerButton;
     private List<GameObject> buttons = new List<GameObject>();
     private float nextAnimationTime = 0;
@@ -24,7 +24,6 @@ public class Winner_Selection_Animation : MonoBehaviour
 
     void Start()
     {
-        winner = hot_Seat_Lottery.Winner;
         buttons = hot_Seat_Lottery.buttons;
         List<GameObject> tempList = new List<GameObject>();
 
@@ -32,7 +31,7 @@ public class Winner_Selection_Animation : MonoBehaviour
         {
             
             //Find winner
-            if (go.GetComponentInChildren<Text>().text == winner)
+            if (go.GetComponentInChildren<Text>().text == hot_Seat_Lottery.Winner)
             {
                 tempList.Add(go);
                 continue;
@@ -79,7 +78,8 @@ public class Winner_Selection_Animation : MonoBehaviour
         {
             selectionScreen.SetActive(false);
             winnerScreen.SetActive(true);
-            winnerDisplayText.text = winner;
+            winnerDisplayText.text = hot_Seat_Lottery.Winner;
+            rewardDisplayText.text = hot_Seat_Lottery.PayOut;
             this.enabled = false;
         }
             
