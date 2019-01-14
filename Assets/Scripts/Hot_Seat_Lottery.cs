@@ -242,19 +242,19 @@ public class Hot_Seat_Lottery : MonoBehaviour
         var data = streamReader.ReadToEnd();
 
         // If the data doesn't exisit
-        if(data == "")
-        {
-            foreach (GameObject go in rewardToggles)
-            {
-                string reward = go.GetComponentInChildren<Text>().text;
-                reward = reward.Remove(0, 1);
-                int numReward;
-                Int32.TryParse(reward, out numReward);
-                possibleRewards.Add(numReward);
-            }
-            rewardStream.Close();
-            return;
-        }
+        //if(data == null)
+        //{
+        //    foreach (GameObject go in rewardToggles)
+        //    {
+        //        string reward = go.GetComponentInChildren<Text>().text;
+        //        reward = reward.Remove(0, 1);
+        //        int numReward;
+        //        Int32.TryParse(reward, out numReward);
+        //        possibleRewards.Add(numReward);
+        //    }
+        //    rewardStream.Close();
+        //    return;
+        //}
 
         // Else Decode Data
         List<int> result = new List<int>();
@@ -306,7 +306,8 @@ public class Hot_Seat_Lottery : MonoBehaviour
             File.Create(Application.persistentDataPath + rewardLogFileName);
 
         StreamWriter streamWriter = new StreamWriter(rewardStream);
-        streamWriter.Write(result);
+        rewardStream.Position = 0;
+        streamWriter.WriteLine(result);
         streamWriter.Close();
     }
 

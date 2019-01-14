@@ -6741,7 +6741,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.32654527, g: 0.26521894, b: 0.3773585, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -7571,7 +7571,7 @@ MonoBehaviour:
   selectionScreen: {fileID: 372802668}
   winnerScreen: {fileID: 457748042}
   winnerDisplayText: {fileID: 304123530}
-  rewardDisplayText: {fileID: 0}
+  rewardDisplayText: {fileID: 1564910120}
 --- !u!1 &847388908
 GameObject:
   m_ObjectHideFlags: 0
@@ -15626,7 +15626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
