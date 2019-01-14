@@ -78,8 +78,10 @@ public class Hot_Seat_Lottery : MonoBehaviour
             string tempString = "";
             for(int i = 0; i < selectionWait; i++) 
             {
-                tempString += streamReader.ReadLine();
+                tempString += streamReader.ReadLine() + " ";
             }
+
+            logStream.Position = 0;
             var parsedString = tempString.Split(' ');
             List<string> tempList = new List<string>();
 
@@ -165,15 +167,15 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
         logStream.Position = 0;
         StreamWriter streamWriter = new StreamWriter(logStream);
-        string newData = winner + " " + winnerPayout + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
+        string newData = winner + " " + winnerPayout + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy HH:mm") + " ";
         streamWriter.WriteLine(newData);
         streamWriter.Write(oldData);
         //string currentLine;
-        //while((currentLine = streamReader.ReadLine()) != null)
+        //while ((currentLine = streamReader.ReadLine()) != null)
         //{
         //    var parsedData = currentLine.Split(' ');
         //    string[] newParsedData = new string[parsedData.Length - 2];
-        //    for(int i = 0; i < parsedData.Length; i++)
+        //    for (int i = 0; i < parsedData.Length; i++)
         //    {
         //        if (i <= 1)
         //            continue;
@@ -182,27 +184,27 @@ public class Hot_Seat_Lottery : MonoBehaviour
         //    }
 
         //    string dateString = "";
-        //    foreach(string s in newParsedData)
+        //    foreach (string s in newParsedData)
         //    {
         //        dateString += s + " ";
         //    }
 
-        //    DateTime loggedTime = DateTime.ParseExact(dateString, "dddd MMMM dd, yyyy @ HH:mm", 
+        //    DateTime loggedTime = DateTime.ParseExact(dateString, "dddd MMMM dd, yyyy HH:mm",
         //        System.Globalization.CultureInfo.CurrentCulture);
         //    var nowTime = DateTime.Now;
-        //    if(loggedTime.Year >= nowTime.Year - 1)
+        //    if (loggedTime.Year >= nowTime.Year - 1)
         //    {
         //        // If from previous year
-        //        if(loggedTime.Year == nowTime.Year - 1)
+        //        if (loggedTime.Year == nowTime.Year - 1)
         //        {
-        //             DateTime newNowTime = new DateTime(nowTime.Year, nowTime.Month + 10, nowTime.Day);
-        //            if(loggedTime.Month >= newNowTime.Month)
+        //            DateTime newNowTime = new DateTime(nowTime.Year, nowTime.Month + 10, nowTime.Day);
+        //            if (loggedTime.Month >= newNowTime.Month)
         //            {
         //                streamWriter.WriteLine(currentLine);
         //            }
         //        }
         //        //If from same year
-        //        if(loggedTime.Month >= nowTime.Month - 2)
+        //        if (loggedTime.Month >= nowTime.Month - 2)
         //        {
         //            streamWriter.WriteLine(currentLine);
         //        }
