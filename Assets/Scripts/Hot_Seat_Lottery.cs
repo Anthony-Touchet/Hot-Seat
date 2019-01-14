@@ -168,6 +168,46 @@ public class Hot_Seat_Lottery : MonoBehaviour
         string newData = winner + " " + winnerPayout + " " + DateTime.Now.ToString("dddd MMMM dd, yyyy @ HH:mm") + " ";
         streamWriter.WriteLine(newData);
         streamWriter.Write(oldData);
+        //string currentLine;
+        //while((currentLine = streamReader.ReadLine()) != null)
+        //{
+        //    var parsedData = currentLine.Split(' ');
+        //    string[] newParsedData = new string[parsedData.Length - 2];
+        //    for(int i = 0; i < parsedData.Length; i++)
+        //    {
+        //        if (i <= 1)
+        //            continue;
+
+        //        newParsedData[i - 2] = parsedData[i];
+        //    }
+
+        //    string dateString = "";
+        //    foreach(string s in newParsedData)
+        //    {
+        //        dateString += s + " ";
+        //    }
+
+        //    DateTime loggedTime = DateTime.ParseExact(dateString, "dddd MMMM dd, yyyy @ HH:mm", 
+        //        System.Globalization.CultureInfo.CurrentCulture);
+        //    var nowTime = DateTime.Now;
+        //    if(loggedTime.Year >= nowTime.Year - 1)
+        //    {
+        //        // If from previous year
+        //        if(loggedTime.Year == nowTime.Year - 1)
+        //        {
+        //             DateTime newNowTime = new DateTime(nowTime.Year, nowTime.Month + 10, nowTime.Day);
+        //            if(loggedTime.Month >= newNowTime.Month)
+        //            {
+        //                streamWriter.WriteLine(currentLine);
+        //            }
+        //        }
+        //        //If from same year
+        //        if(loggedTime.Month >= nowTime.Month - 2)
+        //        {
+        //            streamWriter.WriteLine(currentLine);
+        //        }
+        //    }
+        //}
 
         streamWriter.Close();
         logStream.Close();
@@ -241,21 +281,6 @@ public class Hot_Seat_Lottery : MonoBehaviour
         StreamReader streamReader = new StreamReader(rewardStream);
         var data = streamReader.ReadToEnd();
 
-        // If the data doesn't exisit
-        //if(data == null)
-        //{
-        //    foreach (GameObject go in rewardToggles)
-        //    {
-        //        string reward = go.GetComponentInChildren<Text>().text;
-        //        reward = reward.Remove(0, 1);
-        //        int numReward;
-        //        Int32.TryParse(reward, out numReward);
-        //        possibleRewards.Add(numReward);
-        //    }
-        //    rewardStream.Close();
-        //    return;
-        //}
-
         // Else Decode Data
         List<int> result = new List<int>();
         List<string> temp = new List<string>();
@@ -286,6 +311,9 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
     public void WriteRewards()
     {
+        if (possibleRewards.Contains(0))
+            possibleRewards.Remove(0);
+
         // Encoding Sequence
         string result = "";
         foreach (int i in possibleRewards)
@@ -299,16 +327,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
             result += '!';
         }
 
-        FileStream rewardStream;
-
-        rewardStream = (File.Exists(Application.persistentDataPath + rewardLogFileName)) ?
-            File.Open(Application.persistentDataPath + rewardLogFileName, FileMode.Open) :
-            File.Create(Application.persistentDataPath + rewardLogFileName);
-
-        StreamWriter streamWriter = new StreamWriter(rewardStream);
-        rewardStream.Position = 0;
-        streamWriter.WriteLine(result);
-        streamWriter.Close();
+        File.WriteAllText(Application.persistentDataPath + rewardLogFileName, result);
     }
 
     public void CheckPassword()
