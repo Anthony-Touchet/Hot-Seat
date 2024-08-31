@@ -38,6 +38,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
 
     private List<string> participants = new List<string>();
     public List<int> possibleRewards = new List<int>();
+    public GameObject rewardFailsafeText;
 
     private string lottoHistoryFileName = "/Winner Log.txt";
     private string rewardLogFileName = "/Reward Table.txt";
@@ -61,6 +62,16 @@ public class Hot_Seat_Lottery : MonoBehaviour
         System.Random r = new System.Random();
         List<string> finalists = new List<string>();
         int finalistCount = participants.Count / 4;
+
+        if(possibleRewards.Count == 0){
+            rewardFailsafeText.SetActive(true);
+            return;
+        }
+
+        else{
+            rewardFailsafeText.SetActive(false);
+        }
+
         bool lookinfForWinner = true;
 
         //Look for winner
@@ -75,10 +86,12 @@ public class Hot_Seat_Lottery : MonoBehaviour
             // Select a winning canidate
             var tempWinner = finalists[(int)((Time.time * 10000) - (Time.time * 10000 - r.Next(0, finalists.Count)))];
             //Searching to see if they were selected recently
-            string tempString = "";
+            string tempString = null;
             for(int i = 0; i < selectionWait; i++) 
             {
-                tempString += streamReader.ReadLine() + " ";
+                var emptyCheck = streamReader.ReadLine();
+                if(emptyCheck != "")
+                    tempString += emptyCheck + " ";
             }
 
             logStream.Position = 0;
@@ -104,6 +117,12 @@ public class Hot_Seat_Lottery : MonoBehaviour
         bool lookingForPayout = true;
         while (lookingForPayout)
         {
+            if(possibleRewards.Count == 0)
+            {
+                winnerPayout = "$20";
+                lookingForPayout = false;
+            }
+
             int ticket = r.Next(0, 100);
             if (ticket <= 21 && possibleRewards.Contains(20))
             {
@@ -245,7 +264,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
             }
             toggle.colors = newColor;
 
-            if(participants.Count < 10)
+            if(participants.Count < 10 && possibleRewards.Count <= 0)
             {
                 LottoStartButton.SetActive(false);
             }
@@ -259,7 +278,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         newColor.normalColor = new Color(.5f, .5f, 0);
         toggle.colors = newColor;
 
-        if (participants.Count >= 10)
+        if (participants.Count >= 10 && possibleRewards.Count > 0)
         {
             LottoStartButton.SetActive(true);
         }
@@ -268,6 +287,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
     }
 
     public void QuitProgram()
+
     {
         Application.Quit();
     }
@@ -309,6 +329,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         rewardStream.Close();
 
         possibleRewards = result;
+        rewardFailsafeText.SetActive((possibleRewards.Count <= 0) ? true : false);
     }
 
     public void WriteRewards()
