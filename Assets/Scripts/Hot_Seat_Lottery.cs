@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,13 @@ public class Hot_Seat_Lottery : MonoBehaviour
     public string path;
 
     public List<GameObject> buttons;
-    public List<GameObject> rewardToggles;
+
     public InputField passwordInput;
+    public InputField rewardInput;
+    public GameObject loginUI;
+    public GameObject rewardUI;
+    public RectTransform rewardContentRoot;
+    public GameObject rewardPrefab;
 
     public Winner_Selection_Animation wsa;
     public GameObject LottoStartButton;
@@ -37,7 +42,9 @@ public class Hot_Seat_Lottery : MonoBehaviour
     private string winnerPayout = "";
 
     private List<string> participants = new List<string>();
-    public List<int> possibleRewards = new List<int>();
+    private List<string> activeRewards = new List<string>();              //Active rewards to be pulled from for the winner
+
+
     public GameObject rewardFailsafeText;
 
     private string lottoHistoryFileName = "/Winner Log.txt";
@@ -63,7 +70,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         List<string> finalists = new List<string>();
         int finalistCount = participants.Count / 4;
 
-        if(possibleRewards.Count == 0){
+        if(activeRewards.Count == 0){
             rewardFailsafeText.SetActive(true);
             return;
         }
@@ -117,71 +124,91 @@ public class Hot_Seat_Lottery : MonoBehaviour
         bool lookingForPayout = true;
         while (lookingForPayout)
         {
-            if(possibleRewards.Count == 0)
+            if(activeRewards.Count == 0)
             {
                 winnerPayout = "$20";
                 lookingForPayout = false;
             }
 
             int ticket = r.Next(0, 100);
-            if (ticket <= 21 && possibleRewards.Contains(20))
+
+            if(ticket == 100)
             {
-                winnerPayout = "$20";
+                winnerPayout = activeRewards[activeRewards.Count - 1];
                 lookingForPayout = false;
-            }
-            else if (ticket >= 22 && ticket <= 41 && possibleRewards.Contains(30))
-            {
-                winnerPayout = "$30";
-                lookingForPayout = false;
+                continue;
             }
 
-            else if (ticket >= 42 && ticket <= 56 && possibleRewards.Contains(35))
+            var increment = 100 / activeRewards.Count;
+            int pos = 0;
+
+            while(ticket > increment)
             {
-                winnerPayout = "$35";
-                lookingForPayout = false;
+                pos++;
+                ticket -= increment;
             }
 
-            else if (ticket >= 57 && ticket <= 70 && possibleRewards.Contains(40))
-            {
-                winnerPayout = "$40";
-                lookingForPayout = false;
-            }
+            winnerPayout = activeRewards[pos];
+            lookingForPayout = false;
 
-            else if (ticket >= 71 && ticket <= 77 && possibleRewards.Contains(50))
-            {
-                winnerPayout = "$50";
-                lookingForPayout = false;
-            }
+            //if (ticket <= 21 && activeRewards.Contains("$20"))
+            //{
+            //    winnerPayout = "$20";
+            //    lookingForPayout = false;
+            //}
+            //else if (ticket >= 22 && ticket <= 41 && activeRewards.Contains("$30"))
+            //{
+            //    winnerPayout = "$30";
+            //    lookingForPayout = false;
+            //}
 
-            else if (ticket >= 78 && ticket <= 84 && possibleRewards.Contains(60))
-            {
-                winnerPayout = "$60";
-                lookingForPayout = false;
-            }
+            //else if (ticket >= 42 && ticket <= 56 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$35";
+            //    lookingForPayout = false;
+            //}
 
-            else if (ticket >= 85 && ticket <= 90 && possibleRewards.Contains(80))
-            {
-                winnerPayout = "$80";
-                lookingForPayout = false;
-            }
+            //else if (ticket >= 57 && ticket <= 70 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$40";
+            //    lookingForPayout = false;
+            //}
 
-            else if (ticket >= 91 && ticket <= 94 && possibleRewards.Contains(100))
-            {
-                winnerPayout = "$100";
-                lookingForPayout = false;
-            }
+            //else if (ticket >= 71 && ticket <= 77 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$50";
+            //    lookingForPayout = false;
+            //}
 
-            else if (ticket >= 95 && ticket <= 98 && possibleRewards.Contains(150))
-            {
-                winnerPayout = "$150";
-                lookingForPayout = false;
-            }
+            //else if (ticket >= 78 && ticket <= 84 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$60";
+            //    lookingForPayout = false;
+            //}
 
-            else if (ticket > 98 && possibleRewards.Contains(200))
-            {
-                winnerPayout = "$200";
-                lookingForPayout = false;
-            }
+            //else if (ticket >= 85 && ticket <= 90 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$80";
+            //    lookingForPayout = false;
+            //}
+
+            //else if (ticket >= 91 && ticket <= 94 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$100";
+            //    lookingForPayout = false;
+            //}
+
+            //else if (ticket >= 95 && ticket <= 98 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$150";
+            //    lookingForPayout = false;
+            //}
+
+            //else if (ticket > 98 && activeRewards.Contains(""))
+            //{
+            //    winnerPayout = "$200";
+            //    lookingForPayout = false;
+            //}
         }
 
         logStream.Position = 0;
@@ -264,7 +291,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
             }
             toggle.colors = newColor;
 
-            if(participants.Count < 10 && possibleRewards.Count <= 0)
+            if(participants.Count < 10 && activeRewards.Count <= 0)
             {
                 LottoStartButton.SetActive(false);
             }
@@ -278,7 +305,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         newColor.normalColor = new Color(.5f, .5f, 0);
         toggle.colors = newColor;
 
-        if (participants.Count >= 10 && possibleRewards.Count > 0)
+        if (participants.Count >= 10 && activeRewards.Count > 0)
         {
             LottoStartButton.SetActive(true);
         }
@@ -304,7 +331,7 @@ public class Hot_Seat_Lottery : MonoBehaviour
         var data = streamReader.ReadToEnd();
 
         // Else Decode Data
-        List<int> result = new List<int>();
+        List<string> result = new List<string>();
         List<string> temp = new List<string>();
 
         var parsedData = data.Split('!');
@@ -313,40 +340,45 @@ public class Hot_Seat_Lottery : MonoBehaviour
         foreach (string s in temp)
         {
             int o = 0;
-            string number = "";
+            string rewardCoded = "";
             var parsedString = s.Split(' ');
             foreach (string ss in parsedString)
             {
+
                 Int32.TryParse(ss, out o);
-                number += (char)(o / 87);
+                var n = (char)((o / 87));
+                if (n == '\0')
+                    continue;
+                rewardCoded += n;
             }
 
-            int num = 0;
-            Int32.TryParse(number, out num);
-            result.Add(num);
+            result.Add(rewardCoded);
         }
         result.Remove(result.Last());
         rewardStream.Close();
 
-        possibleRewards = result;
-        rewardFailsafeText.SetActive((possibleRewards.Count <= 0) ? true : false);
+        activeRewards = result;
+        rewardFailsafeText.SetActive((activeRewards.Count <= 0) ? true : false);
     }
 
     public void WriteRewards()
     {
-        if (possibleRewards.Contains(0))
-            possibleRewards.Remove(0);
+        if (activeRewards.Contains(""))
+            activeRewards.Remove("");
 
         // Encoding Sequence
         string result = "";
-        foreach (int i in possibleRewards)
+        foreach (string i in activeRewards)
         {
             string temp = i.ToString();
             foreach (char c in temp)
             {
-                result += (int)c * 87;
+                var sam = (int)((c * 87));
+                result += sam;
                 result += " ";
             }
+
+            result.Remove(result.Length - 1);
             result += '!';
         }
 
@@ -357,26 +389,15 @@ public class Hot_Seat_Lottery : MonoBehaviour
     {
        if(passwordInput.text == "iloveyou143")
         {
-            foreach(GameObject go in rewardToggles)
+            loginUI.SetActive(false);
+            rewardUI.SetActive(true);
+
+            foreach(string i in activeRewards)
             {
-                go.SetActive(true);
+                var inst = Instantiate(rewardPrefab, rewardContentRoot);
+                inst.GetComponentInChildren<Text>().text = i;
+
             }
-            ColorBlock newColor = ColorBlock.defaultColorBlock;
-            newColor.normalColor = Color.green;
-            newColor.highlightedColor = Color.green;
-
-            passwordInput.colors = newColor;
-
-            foreach(GameObject go in rewardToggles)
-            {
-                var toggle = go.GetComponent<Toggle>();
-                string rewardString = go.GetComponentInChildren<Text>().text.Remove(0, 1);
-                int rewardInt;
-                Int32.TryParse(rewardString, out rewardInt);
-
-                toggle.isOn = (possibleRewards.Contains(rewardInt)) ? true : false;
-            }
-
         }
 
         else
@@ -398,18 +419,60 @@ public class Hot_Seat_Lottery : MonoBehaviour
     public void OnRewardToggle(GameObject go)
     {
         bool toggle = go.GetComponent<Toggle>().isOn;
-        int reward = 0;
-        Int32.TryParse(go.GetComponentInChildren<Text>().text.Remove(0, 1), out reward);
+        string reward = go.GetComponentInChildren<Text>().text;
 
-        if (toggle == true && !possibleRewards.Contains(reward))
+        if (toggle == true && !activeRewards.Contains(reward))
         {
-            possibleRewards.Add(reward);
+            activeRewards.Add(reward);
         }
 
-        else if (toggle == false && possibleRewards.Contains(reward))
+        else if (toggle == false && activeRewards.Contains(reward))
         {
-            possibleRewards.Remove(reward);
+            activeRewards.Remove(reward);
         }
+    }
+
+    public void AddPossibleReward()
+    {
+
+        string rewardText = rewardInput.text;
+        rewardInput.text = "";
+
+        if (activeRewards.Contains(rewardText) || string.IsNullOrEmpty(rewardText) || rewardText.All(char.IsWhiteSpace))
+        {
+            return;
+        }
+
+        var inst = Instantiate(rewardPrefab, rewardContentRoot);
+        inst.GetComponentInChildren<Text>().text = rewardText;
+        activeRewards.Add(rewardText);
+
+        rewardContentRoot.sizeDelta = new Vector2(0, activeRewards.Count * 80);
+    }
+
+    public void DeleteSelectedRewards()
+    {
+        List<GameObject> destroyList = new List<GameObject>();
+
+        foreach(Transform trans in rewardContentRoot)
+        {
+            string transText = trans.GetComponentInChildren<Text>().text;
+            if (trans.GetComponent<Toggle>().isOn)
+            {
+                destroyList.Add(trans.gameObject);
+                activeRewards.Remove(transText);
+            }
+            
+        }
+
+        while (destroyList.Count > 0)
+        {
+            var temp = destroyList[0];
+            destroyList.Remove(temp);
+            Destroy(temp);
+        }
+
+        rewardContentRoot.sizeDelta = new Vector2(0, activeRewards.Count * 80);
     }
 }
 
